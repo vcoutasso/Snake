@@ -1,11 +1,13 @@
 #!/usr/bin/python3
 
 import tkinter as tk
-from random import *
+from random import seed, randint, randrange
 
 WIDTH = 640
 HEIGHT = 480
 DELAY = 100
+
+SQUARE_SIDE_LENGTH = 20
 
 LEFT = 1
 DOWN = 2
@@ -40,11 +42,11 @@ class Game(object):
 
     def printGrid(self):
         # Imprime linhas verticais
-        self.canvas.create_line(20, 20, 20, HEIGHT - 20, width=1)
-        self.canvas.create_line(WIDTH - 20, 20, WIDTH - 20, HEIGHT - 20, width=1)
+        self.canvas.create_line(SQUARE_SIDE_LENGTH, SQUARE_SIDE_LENGTH, SQUARE_SIDE_LENGTH, HEIGHT - SQUARE_SIDE_LENGTH, width=1)
+        self.canvas.create_line(WIDTH - SQUARE_SIDE_LENGTH, SQUARE_SIDE_LENGTH, WIDTH - SQUARE_SIDE_LENGTH, HEIGHT - SQUARE_SIDE_LENGTH, width=1)
         # Imprime linhas horizontais
-        self.canvas.create_line(20, 20, WIDTH - 20, 20, width=1)
-        self.canvas.create_line(20, HEIGHT - 20, WIDTH - 20, HEIGHT - 20, width=1)
+        self.canvas.create_line(SQUARE_SIDE_LENGTH, SQUARE_SIDE_LENGTH, WIDTH - SQUARE_SIDE_LENGTH, SQUARE_SIDE_LENGTH, width=1)
+        self.canvas.create_line(SQUARE_SIDE_LENGTH, HEIGHT - SQUARE_SIDE_LENGTH, WIDTH - SQUARE_SIDE_LENGTH, HEIGHT - SQUARE_SIDE_LENGTH, width=1)
 
 class Apple(object):
     def __init__(self):
@@ -53,21 +55,14 @@ class Apple(object):
         self.radius = 16
 
     def newPosition(self, Snake):
-        seed()
-        reroll = 1
-        bateu = 0
-        while reroll == 1:
-            self.pos_x = randrange(1, int((WIDTH - 20) / 20)) * 20
-            self.pos_y = randrange(1, int((HEIGHT - 20) / 20)) * 20
-            for i in range(1, len(Snake.posicoes_y) - 1):
-                if self.pos_y == Snake.posicoes_y[i] and self.pos_x == Snake.posicoes_x[i]:
-                    bateu = 1
-                    break
+        while True:
+            self.pos_x = randrange(1, int((WIDTH - SQUARE_SIDE_LENGTH) / SQUARE_SIDE_LENGTH)) * SQUARE_SIDE_LENGTH
+            self.pos_y = randrange(1, int((HEIGHT - SQUARE_SIDE_LENGTH) / SQUARE_SIDE_LENGTH)) * SQUARE_SIDE_LENGTH
 
-            if bateu == 0:
-                reroll = 0
+            if(self.pos_y in Snake.posicoes_y and self.pos_x in Snake.posicoes_x):
+                continue
 
-
+            break
 
     def print(self, canvas):
         canvas.create_oval(self.pos_x + 4, self.pos_y + 4, self.pos_x + self.radius, self.pos_y + self.radius, fill='red')
@@ -79,10 +74,10 @@ class Snake(object):
         self.fimDeJogo = False
         self.pos_x = WIDTH / 2
         self.pos_y = HEIGHT / 2
-        self.size = 20
-        self.speed = 20
-        self.thickness = 20
-        self.direction = LEFT
+        self.size = SQUARE_SIDE_LENGTH
+        self.speed = SQUARE_SIDE_LENGTH
+        self.thickness = SQUARE_SIDE_LENGTH
+        self.direction = randint(LEFT, RIGHT)
         self.quadradinhos = 1
         self.score = 0
         self.posicoes_x = []
@@ -122,8 +117,8 @@ class Snake(object):
             elif self.direction == RIGHT:
                 self.pos_x = self.pos_x + self.speed
 
-            if (self.pos_x < 0 or self.pos_x > WIDTH - 20 or self.pos_y < 0 or self.pos_y > HEIGHT - 20) or \
-                    (self.pos_x + self.size > WIDTH - 20 or self.pos_y + self.size > HEIGHT - 20):
+            # If out of bounds
+            if (self.pos_x < SQUARE_SIDE_LENGTH or self.pos_x >= WIDTH - SQUARE_SIDE_LENGTH or self.pos_y < SQUARE_SIDE_LENGTH or self.pos_y >= HEIGHT - SQUARE_SIDE_LENGTH):
                 self.fimDeJogo = True
 
             for i in range(0, len(self.posicoes_y) - 1):
@@ -166,11 +161,16 @@ class Snake(object):
             exit(1)
 
 
-
     def gameOver(self, canvas):
         canvas.create_text(WIDTH / 2, HEIGHT / 2, font="Times 20 bold", text="GAME OVER")
 
 
-apple = Apple()
-snake = Snake()
-main = Game(snake, apple)
+
+if __name__ == "__main__":
+
+    # Inicializa o gerador de números aleatórios com uma semente (por padrão baseada no tempo atual)
+    seed()
+
+    apple = Apple()
+    snake = Snake()
+    main = Game(snake, apple)
