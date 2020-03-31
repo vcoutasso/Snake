@@ -5,7 +5,7 @@ from random import seed, randint, randrange
 
 WIDTH = 640
 HEIGHT = 480
-DELAY = 100
+DELAY = 80
 
 SQUARE_SIDE_LENGTH = 20
 
@@ -33,7 +33,7 @@ class Game(object):
         snake.move(apple, self.canvas)
         self.printScore(snake)
         if snake.fimDeJogo == False:
-            self.window.after(100, self.timer)
+            self.window.after(DELAY, self.timer)
         else:
             snake.gameOver(self.canvas)
 
@@ -157,6 +157,8 @@ class Snake(object):
                 self.fimDeJogo = True
             else:
                 self.direction = RIGHT
+
+
         elif e.keysym == "Escape":
             exit(1)
 
